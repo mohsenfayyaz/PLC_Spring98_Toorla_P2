@@ -343,6 +343,7 @@ public class NameAnalyzer implements Visitor<Void> {
         SymbolTable st = new SymbolTable(symbolTable);
         for (ParameterDeclaration param : methodDeclaration.getArgs()) {
             LocalVariableSymbolTableItem lvt = new LocalVariableSymbolTableItem(param.getIdentifier().toString(), varIndex);
+            varIndex ++;
             try {
                 st.put(lvt);
             }
@@ -353,6 +354,8 @@ public class NameAnalyzer implements Visitor<Void> {
         for (Statement statement: methodDeclaration.getBody()) {
             statement.accept(this);
         }
+        varIndex = 1;
+        symbolTable.pop();
         return null;
     }
 
