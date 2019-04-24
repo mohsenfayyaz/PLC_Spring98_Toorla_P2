@@ -51,7 +51,9 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(Block block) {
-
+        for (Statement statement : block.body) {
+            statement.accept(this);
+        }
         return null;
     }
 
