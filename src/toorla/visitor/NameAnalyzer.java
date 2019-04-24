@@ -1,5 +1,6 @@
 package toorla.visitor;
 
+import sun.jvm.hotspot.debugger.cdbg.Sym;
 import toorla.ast.Program;
 import toorla.ast.Tree;
 import toorla.ast.declaration.classDecs.ClassDeclaration;
@@ -22,10 +23,12 @@ import toorla.ast.statement.returnStatement.Return;
 import toorla.symbolTable.SymbolTable;
 import toorla.symbolTable.exceptions.ItemAlreadyExistsException;
 import toorla.symbolTable.symbolTableItem.ClassSymbolTableItem;
+import toorla.symbolTable.symbolTableItem.FieldSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.MethodSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.LocalVariableSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.VarSymbolTableItem;
 
+import javax.sound.midi.SysexMessage;
 import java.util.List;
 
 public class NameAnalyzer implements Visitor<Void> {
@@ -38,145 +41,70 @@ public class NameAnalyzer implements Visitor<Void> {
     }
     @Override
     public Void visit(PrintLine printStat) {
-        try {
-//            printStat.getArg().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
     public Void visit(Assign assignStat) {
-        try {
-            assignStat.getLvalue().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
-        try {
-            assignStat.getRvalue().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
     public Void visit(Block block) {
-        //TODO
-        for (Statement s : block.body) {
-            try {
-                s.accept(this);
-            }
-            catch (Exception exception) {
-                //
-            }
-        }
         return null;
     }
 
     @Override
     public Void visit(Conditional conditional) {
-        //TODO
-        try {
-            conditional.getCondition().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
-        try {
-            conditional.getThenStatement().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
-        try {
-            conditional.getElseStatement().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
     public Void visit(While whileStat) {
-        try {
-            whileStat.expr.accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
-        try {
-            whileStat.body.accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
     public Void visit(Return returnStat) {
-        try {
-            returnStat.getReturnedExpr().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
     public Void visit(Break breakStat) {
-        // has nothing to check
         return null;
     }
 
     @Override
     public Void visit(Continue continueStat) {
-        // has nothing to check
         return null;
     }
 
     @Override
     public Void visit(Skip skip) {
-        // has nothing to check
         return null;
     }
 
     @Override
     public Void visit(LocalVarDef localVarDef) {
-        // has a lot to do with this one
-        //TODO
-        String var_name = localVarDef.getLocalVarName().getName();
-
-
+        LocalVariableSymbolTableItem lvt = new LocalVariableSymbolTableItem(localVarDef.getLocalVarName().toString(), varIndex);
+        try {
+            symbolTable.top.put(lvt);
+        }
+        catch (Exception exception) {
+            System.out.println("Error:Line:#" + localVarDef.line + ":Redefinition of Local Variable localVar in current scope");
+        }
+        localVarDef.getLocalVarName().setIndex(varIndex);
+        varIndex++;
         return null;
     }
 
     @Override
     public Void visit(IncStatement incStatement) {
-        try {
-            incStatement.getOperand().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
     public Void visit(DecStatement decStatement) {
-        try {
-            decStatement.getOperand().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
@@ -310,17 +238,38 @@ public class NameAnalyzer implements Visitor<Void> {
             md.accept(this);
         }
         symbolTable.top.pop();
-
         return null;
     }
 
     @Override
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
+        String className = entryClassDeclaration.getName().getName();
+        ClassSymbolTableItem myClassScope = new ClassSymbolTableItem(className, symbolTable.top);
+        try {
+            symbolTable.top.put(myClassScope);
+        }
+        catch (ItemAlreadyExistsException e) {
+            System.out.println("Error:Line:#"+entryClassDeclaration.line+":Redefinition of Class "+className );
+        }
+        symbolTable.top.push(myClassScope.getSymbolTable());
+        for (ClassMemberDeclaration md : entryClassDeclaration.getClassMembers()) {
+            md.accept(this);
+        }
+        symbolTable.top.pop();
         return null;
     }
 
     @Override
     public Void visit(FieldDeclaration fieldDeclaration) {
+        FieldSymbolTableItem ft = new FieldSymbolTableItem(fieldDeclaration.getIdentifier().toString());
+        ft.setAccessModifier(fieldDeclaration.getAccessModifier());
+        ft.setType(fieldDeclaration.getType());
+        try {
+            symbolTable.top.put(ft);
+        }
+        catch (Exception exception) {
+            System.out.println("Error:Line:#"+ fieldDeclaration.line + ":Redefinition of Field " + fieldDeclaration.getIdentifier().toString());
+        }
         return null;
     }
 
@@ -335,14 +284,15 @@ public class NameAnalyzer implements Visitor<Void> {
         methodSymbolTableItem.setAccessModifier(methodDeclaration.getAccessModifier());
         methodSymbolTableItem.setReturnType(methodDeclaration.getReturnType());
         try {
-            symbolTable.put(methodSymbolTableItem);
+            symbolTable.top.put(methodSymbolTableItem);
         }
         catch (Exception exception) {
             //
         }
-        SymbolTable st = new SymbolTable(symbolTable);
+        SymbolTable st = new SymbolTable(symbolTable.top);
         for (ParameterDeclaration param : methodDeclaration.getArgs()) {
             LocalVariableSymbolTableItem lvt = new LocalVariableSymbolTableItem(param.getIdentifier().toString(), varIndex);
+            param.getIdentifier().setIndex(varIndex);
             varIndex ++;
             try {
                 st.put(lvt);
@@ -355,7 +305,7 @@ public class NameAnalyzer implements Visitor<Void> {
             statement.accept(this);
         }
         varIndex = 1;
-        symbolTable.pop();
+        symbolTable.top.pop();
         return null;
     }
 
