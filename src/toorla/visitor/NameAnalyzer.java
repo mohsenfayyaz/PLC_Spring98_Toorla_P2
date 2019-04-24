@@ -22,7 +22,9 @@ import toorla.ast.statement.returnStatement.Return;
 import toorla.symbolTable.SymbolTable;
 import toorla.symbolTable.exceptions.ItemAlreadyExistsException;
 import toorla.symbolTable.symbolTableItem.ClassSymbolTableItem;
+import toorla.symbolTable.symbolTableItem.MethodSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.LocalVariableSymbolTableItem;
+import toorla.symbolTable.symbolTableItem.varItems.VarSymbolTableItem;
 
 import java.util.List;
 
@@ -329,6 +331,28 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(MethodDeclaration methodDeclaration) {
+        MethodSymbolTableItem methodSymbolTableItem = new MethodSymbolTableItem(methodDeclaration.getName().toString());
+        methodSymbolTableItem.setAccessModifier(methodDeclaration.getAccessModifier());
+        methodSymbolTableItem.setReturnType(methodDeclaration.getReturnType());
+        try {
+            symbolTable.put(methodSymbolTableItem);
+        }
+        catch (Exception exception) {
+            //
+        }
+        SymbolTable st = new SymbolTable(symbolTable);
+        for (ParameterDeclaration param : methodDeclaration.getArgs()) {
+            LocalVariableSymbolTableItem lvt = new LocalVariableSymbolTableItem(param.getIdentifier().toString(), varIndex);
+            try {
+                st.put(lvt);
+            }
+            catch (Exception exception) {
+                // nothing to do with this one cause absolutely no errors gonna happen
+            }
+        }
+        for (Statement statement: methodDeclaration.getBody()) {
+            statement.accept(this);
+        }
         return null;
     }
 
@@ -343,18 +367,10 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(Program program) { // DONE
-        try {
-            List<ClassDeclaration> classes;
-            classes = program.getClasses();
-            if(classes.isEmpty())
-                throw new Exception();
-
-            for (ClassDeclaration cd : classes) {
-                cd.accept(this);
-            }
-        }
-        catch (Exception exception) {
-            System.out.println("Error:There must be at least one class in a Toorla code");
+        List<ClassDeclaration> classes;
+        classes = program.getClasses();
+        for (ClassDeclaration cd : classes) {
+            cd.accept(this);
         }
         return null;
     }
