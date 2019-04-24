@@ -1,0 +1,6 @@
+entry class Test:
+    function main() returns int:
+        return 0;
+    end
+
+end
