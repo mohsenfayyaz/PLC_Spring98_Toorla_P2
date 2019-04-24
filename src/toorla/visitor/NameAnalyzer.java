@@ -22,6 +22,7 @@ import toorla.ast.statement.localVarStats.LocalVarsDefinitions;
 import toorla.ast.statement.returnStatement.Return;
 import toorla.symbolTable.SymbolTable;
 import toorla.symbolTable.exceptions.ItemAlreadyExistsException;
+import toorla.symbolTable.exceptions.LengthFieldDeclarationException;
 import toorla.symbolTable.symbolTableItem.ClassSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.FieldSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.MethodSymbolTableItem;
@@ -236,8 +237,8 @@ public class NameAnalyzer implements Visitor<Void> {
         try {
             symbolTable.top.put(myClassScope);
         }
-        catch (ItemAlreadyExistsException e) {
-            System.out.println("Error:Line:#"+classDeclaration.line+":Redefinition of Class "+className );
+        catch (ItemAlreadyExistsException exception) {
+            exception.emitErrorMessage(classDeclaration.line, classDeclaration.getName().toString(), "class");
         }
         symbolTable.top.push(myClassScope.getSymbolTable());
         for (ClassMemberDeclaration md : classDeclaration.getClassMembers()) {
@@ -254,8 +255,8 @@ public class NameAnalyzer implements Visitor<Void> {
         try {
             symbolTable.top.put(myClassScope);
         }
-        catch (ItemAlreadyExistsException e) {
-            System.out.println("Error:Line:#"+entryClassDeclaration.line+":Redefinition of Class "+className );
+        catch (ItemAlreadyExistsException exception) {
+            exception.emitErrorMessage(entryClassDeclaration.line, entryClassDeclaration.getName().toString(), "class");
         }
         symbolTable.top.push(myClassScope.getSymbolTable());
         for (ClassMemberDeclaration md : entryClassDeclaration.getClassMembers()) {
@@ -271,10 +272,17 @@ public class NameAnalyzer implements Visitor<Void> {
         ft.setAccessModifier(fieldDeclaration.getAccessModifier());
         ft.setType(fieldDeclaration.getType());
         try {
+            if (fieldDeclaration.getIdentifier().toString().equals("length"))
+                throw new LengthFieldDeclarationException();
+        }
+        catch (LengthFieldDeclarationException exception) {
+            exception.emitErrorMessage(fieldDeclaration.line);
+        }
+        try {
             symbolTable.top.put(ft);
         }
-        catch (Exception exception) {
-            System.out.println("Error:Line:#"+ fieldDeclaration.line + ":Redefinition of Field " + fieldDeclaration.getIdentifier().toString());
+        catch (ItemAlreadyExistsException exception) {
+            exception.emitErrorMessage(fieldDeclaration.line, fieldDeclaration.getIdentifier().toString(), "field");
         }
         return null;
     }
@@ -292,8 +300,8 @@ public class NameAnalyzer implements Visitor<Void> {
         try {
             symbolTable.top.put(methodSymbolTableItem);
         }
-        catch (Exception exception) {
-            //
+        catch (ItemAlreadyExistsException exception) {
+            exception.emitErrorMessage(methodDeclaration.line, methodDeclaration.getName().toString(), "method");
         }
         SymbolTable st = new SymbolTable(symbolTable.top);
         for (ParameterDeclaration param : methodDeclaration.getArgs()) {
