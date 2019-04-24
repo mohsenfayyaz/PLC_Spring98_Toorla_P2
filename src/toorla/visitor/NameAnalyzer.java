@@ -1,8 +1,10 @@
 package toorla.visitor;
 
 import toorla.ast.Program;
+import toorla.ast.Tree;
 import toorla.ast.declaration.classDecs.ClassDeclaration;
 import toorla.ast.declaration.classDecs.EntryClassDeclaration;
+import toorla.ast.declaration.classDecs.classMembersDecs.ClassMemberDeclaration;
 import toorla.ast.declaration.classDecs.classMembersDecs.FieldDeclaration;
 import toorla.ast.declaration.classDecs.classMembersDecs.MethodDeclaration;
 import toorla.ast.declaration.localVarDecs.ParameterDeclaration;
@@ -17,14 +19,25 @@ import toorla.ast.statement.*;
 import toorla.ast.statement.localVarStats.LocalVarDef;
 import toorla.ast.statement.localVarStats.LocalVarsDefinitions;
 import toorla.ast.statement.returnStatement.Return;
+import toorla.symbolTable.SymbolTable;
+import toorla.symbolTable.exceptions.ItemAlreadyExistsException;
+import toorla.symbolTable.symbolTableItem.ClassSymbolTableItem;
+import toorla.symbolTable.symbolTableItem.varItems.LocalVariableSymbolTableItem;
 
 import java.util.List;
 
 public class NameAnalyzer implements Visitor<Void> {
+    SymbolTable symbolTable = new SymbolTable();
+    int varIndex = 1;
+
+    public NameAnalyzer(){
+        symbolTable.push(symbolTable);
+        symbolTable.root = symbolTable;
+    }
     @Override
     public Void visit(PrintLine printStat) {
         try {
-            printStat.getArg().accept(this);
+//            printStat.getArg().accept(this);
         }
         catch (Exception exception) {
             //
@@ -51,6 +64,7 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(Block block) {
+        //TODO
         for (Statement s : block.body) {
             try {
                 s.accept(this);
@@ -64,6 +78,7 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(Conditional conditional) {
+        //TODO
         try {
             conditional.getCondition().accept(this);
         }
@@ -134,6 +149,10 @@ public class NameAnalyzer implements Visitor<Void> {
     @Override
     public Void visit(LocalVarDef localVarDef) {
         // has a lot to do with this one
+        //TODO
+        String var_name = localVarDef.getLocalVarName().getName();
+
+
         return null;
     }
 
@@ -161,228 +180,81 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(Plus plusExpr) {
-        try {
-            plusExpr.getLhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
-        try {
-            plusExpr.getRhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
     public Void visit(Minus minusExpr) {
-        try {
-            minusExpr.getLhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
-        try {
-            minusExpr.getRhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
     public Void visit(Times timesExpr) {
-        try {
-            timesExpr.getLhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
-        try {
-            timesExpr.getRhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
     public Void visit(Division divExpr) {
-        try {
-            divExpr.getLhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
-        try {
-            divExpr.getRhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
     public Void visit(Modulo moduloExpr) {
-        try {
-            moduloExpr.getLhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
-        try {
-            moduloExpr.getRhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
     public Void visit(Equals equalsExpr) {
-        try {
-            equalsExpr.getLhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
-        try {
-            equalsExpr.getRhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
     public Void visit(GreaterThan gtExpr) {
-        try {
-            gtExpr.getLhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
-        try {
-            gtExpr.getRhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
     public Void visit(LessThan lessThanExpr) {
-        try {
-            lessThanExpr.getLhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
-        try {
-            lessThanExpr.getRhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
     public Void visit(And andExpr) {
-        try {
-            andExpr.getLhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
-        try {
-            andExpr.getRhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
     public Void visit(Or orExpr) {
-        try {
-            orExpr.getLhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
-        try {
-            orExpr.getRhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
     public Void visit(Neg negExpr) {
-        try {
-            negExpr.getExpr().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
     public Void visit(Not notExpr) {
-        try {
-            notExpr.getExpr().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
-    public Void visit(MethodCall methodCall) { // has some works to do with
-//        try {
-//            methodCall.getInstance().accept(this);
-//        }
-//        catch (Exception exception) {
-            //
-//        }
-//        try {
-//            methodCall.getMethodName()
-//        }
-//        catch (Exception exception) {
-            //
-//        }
+    public Void visit(MethodCall methodCall) {
         return null;
     }
 
     @Override
     public Void visit(Identifier identifier) {
-        // ....
         return null;
     }
 
     @Override
     public Void visit(Self self) {
-        // ...
         return null;
     }
 
     @Override
     public Void visit(IntValue intValue) {
-        // ...
         return null;
     }
 
@@ -393,53 +265,50 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(BoolValue booleanValue) {
-        // ...
         return null;
     }
 
     @Override
     public Void visit(StringValue stringValue) {
-        // ...
         return null;
     }
 
     @Override
     public Void visit(NewClassInstance newClassInstance) {
-        // ...
         return null;
     }
 
     @Override
     public Void visit(FieldCall fieldCall) {
-        // ...
         return null;
     }
 
     @Override
     public Void visit(ArrayCall arrayCall) {
-        // ...
         return null;
     }
 
     @Override
     public Void visit(NotEquals notEquals) {
-        try {
-            notEquals.getLhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
-        try {
-            notEquals.getRhs().accept(this);
-        }
-        catch (Exception exception) {
-            //
-        }
         return null;
     }
 
     @Override
-    public Void visit(ClassDeclaration classDeclaration) {
+    public Void visit(ClassDeclaration classDeclaration) { //DONE
+        String className = classDeclaration.getName().getName();
+        ClassSymbolTableItem myClassScope = new ClassSymbolTableItem(className, symbolTable.top);
+        try {
+            symbolTable.top.put(myClassScope);
+        }
+        catch (ItemAlreadyExistsException e) {
+            System.out.println("Error:Line:#"+classDeclaration.line+":Redefinition of Class "+className );
+        }
+        symbolTable.top.push(myClassScope.getSymbolTable());
+        for (ClassMemberDeclaration md : classDeclaration.getClassMembers()) {
+            md.accept(this);
+        }
+        symbolTable.top.pop();
+
         return null;
     }
 
@@ -465,20 +334,27 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(LocalVarsDefinitions localVarsDefinitions) {
+        for (LocalVarDef var : localVarsDefinitions.getVarDefinitions()) {
+            var.accept(this);
+        }
+
         return null;
     }
 
     @Override
-    public Void visit(Program program) {
+    public Void visit(Program program) { // DONE
         try {
             List<ClassDeclaration> classes;
             classes = program.getClasses();
-//            for (ClassDeclaration cd : classes) {
-//                cd.getClassMembers()
-//            }
+            if(classes.isEmpty())
+                throw new Exception();
+
+            for (ClassDeclaration cd : classes) {
+                cd.accept(this);
+            }
         }
         catch (Exception exception) {
-            //
+            System.out.println("Error:There must be at least one class in a Toorla code");
         }
         return null;
     }
