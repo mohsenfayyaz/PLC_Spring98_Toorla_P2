@@ -51,16 +51,20 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(Block block) {
+
         return null;
     }
 
     @Override
     public Void visit(Conditional conditional) {
+        conditional.getThenStatement().accept(this);
+        conditional.getElseStatement().accept(this);
         return null;
     }
 
     @Override
     public Void visit(While whileStat) {
+        whileStat.body.accept(this);
         return null;
     }
 
