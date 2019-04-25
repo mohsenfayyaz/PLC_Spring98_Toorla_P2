@@ -23,21 +23,23 @@ import toorla.ast.statement.returnStatement.Return;
 import toorla.symbolTable.SymbolTable;
 import toorla.symbolTable.exceptions.ItemAlreadyExistsException;
 import toorla.symbolTable.exceptions.LengthFieldDeclarationException;
-import toorla.symbolTable.symbolTableItem.ClassSymbolTableItem;
-import toorla.symbolTable.symbolTableItem.FieldSymbolTableItem;
-import toorla.symbolTable.symbolTableItem.MethodSymbolTableItem;
-import toorla.symbolTable.symbolTableItem.ScopeSymbolTableItem;
+import toorla.symbolTable.symbolTableItem.*;
 import toorla.symbolTable.symbolTableItem.varItems.LocalVariableSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.VarSymbolTableItem;
 
 import javax.sound.midi.SysexMessage;
 import java.util.List;
+import java.util.Map;
 
 public class NameAnalyzerPreProcess implements Visitor<Void> {
     private SymbolTable symbolTable = new SymbolTable();
     int varIndex = 1;
     int scopeIndex = 0;
+    private Map<String, SymbolTable> classSymbolTable;
 
+    public Map<String, SymbolTable> getClassSymbolTable(){
+        return classSymbolTable;
+    }
 
     public NameAnalyzerPreProcess(){
         symbolTable.push(symbolTable);
@@ -222,6 +224,8 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
     public Void visit(ClassDeclaration classDeclaration) { //DONE
         String className = classDeclaration.getName().getName();
         ClassSymbolTableItem myClassScope = new ClassSymbolTableItem(className, symbolTable.top);
+        classSymbolTable.put(className, myClassScope.getSymbolTable());
+
         try {
             symbolTable.top.put(myClassScope);
         }
@@ -238,6 +242,9 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
         String className = entryClassDeclaration.getName().getName();
         ClassSymbolTableItem myClassScope = new ClassSymbolTableItem(className, symbolTable.top);
+        classSymbolTable.put(className, myClassScope.getSymbolTable());
+
+
         try {
             symbolTable.top.put(myClassScope);
         }
