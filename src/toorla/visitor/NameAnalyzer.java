@@ -282,6 +282,8 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(FieldDeclaration fieldDeclaration) {
+        fieldDeclaration.symbolTable = symbolTable.top;
+
         FieldSymbolTableItem ft = new FieldSymbolTableItem(fieldDeclaration.getIdentifier().getName());
         ft.setAccessModifier(fieldDeclaration.getAccessModifier());
         ft.setType(fieldDeclaration.getType());
@@ -290,7 +292,8 @@ public class NameAnalyzer implements Visitor<Void> {
                 throw new LengthFieldDeclarationException();
 
             try {
-                symbolTable.top.put(ft);
+                symbolTable.top.putClassMembers(ft, symbolTable.top);
+
             }
             catch (ItemAlreadyExistsException exception) {
                 exception.emitErrorMessage(fieldDeclaration.line, fieldDeclaration.getIdentifier().getName(), "field");
@@ -304,7 +307,6 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(ParameterDeclaration parameterDeclaration) {
-
         parameterDeclaration.symbolTable = symbolTable.top;
         String argName = parameterDeclaration.getIdentifier().getName();
         LocalVariableSymbolTableItem lvt = new LocalVariableSymbolTableItem(argName, varIndex);
@@ -328,7 +330,7 @@ public class NameAnalyzer implements Visitor<Void> {
         methodSymbolTableItem.setAccessModifier(methodDeclaration.getAccessModifier());
         methodSymbolTableItem.setReturnType(methodDeclaration.getReturnType());
         try {
-            symbolTable.top.put(methodSymbolTableItem);
+            symbolTable.top.putClassMembers(methodSymbolTableItem, symbolTable.top);
         }
         catch (ItemAlreadyExistsException exception) {
             exception.emitErrorMessage(methodDeclaration.line, methodName, "method");

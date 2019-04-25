@@ -46,10 +46,17 @@ public class SymbolTable {
         items.put(item.getKey(), item);
     }
 
-    public void putClassMembers(SymbolTableItem item) throws ItemAlreadyExistsException {
-        if (items.containsKey(item.getKey()))
-            throw new ItemAlreadyExistsException();
-        items.put(item.getKey(), item);
+    public void putClassMembers(SymbolTableItem item, SymbolTable classSymbolTable) throws ItemAlreadyExistsException {
+        SymbolTable ancestorsSymbolTable = classSymbolTable;
+
+        while(ancestorsSymbolTable.pre != null) {
+            if (ancestorsSymbolTable.items.containsKey(item.getKey()))
+                throw new ItemAlreadyExistsException();
+
+            ancestorsSymbolTable.items.put(item.getKey(), item);
+
+            ancestorsSymbolTable = ancestorsSymbolTable.pre;
+        }
     }
 
 
