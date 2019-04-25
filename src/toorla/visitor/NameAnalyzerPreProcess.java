@@ -231,6 +231,7 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
         String className = classDeclaration.getName().getName();
         ClassSymbolTableItem myClassScope = new ClassSymbolTableItem(className, symbolTable.top);
         classNameNodes.put(className, classDeclaration);
+        classSymbolTable.put(className, myClassScope.getSymbolTable());
 
         try {
             symbolTable.top.put(myClassScope);
@@ -249,6 +250,7 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
         String className = entryClassDeclaration.getName().getName();
         ClassSymbolTableItem myClassScope = new ClassSymbolTableItem(className, symbolTable.top);
         classNameNodes.put(className, entryClassDeclaration);
+        classSymbolTable.put(className, myClassScope.getSymbolTable());
 
         try {
             symbolTable.top.put(myClassScope);
