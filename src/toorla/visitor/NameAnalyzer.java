@@ -97,7 +97,7 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(LocalVarDef localVarDef) {
-        LocalVariableSymbolTableItem localVariableSymbolTableItem = new LocalVariableSymbolTableItem(localVarDef.getLocalVarName().toString(), varIndex);
+        LocalVariableSymbolTableItem localVariableSymbolTableItem = new LocalVariableSymbolTableItem(localVarDef.getLocalVarName().getName(), varIndex);
         try {
             symbolTable.top.put(localVariableSymbolTableItem);
         }
@@ -242,7 +242,7 @@ public class NameAnalyzer implements Visitor<Void> {
             symbolTable.top.put(myClassScope);
         }
         catch (ItemAlreadyExistsException exception) {
-            exception.emitErrorMessage(classDeclaration.line, classDeclaration.getName().toString(), "class");
+            exception.emitErrorMessage(classDeclaration.line, classDeclaration.getName().getName(), "class");
         }
         symbolTable.top.push(myClassScope.getSymbolTable());
         for (ClassMemberDeclaration md : classDeclaration.getClassMembers()) {
@@ -260,7 +260,7 @@ public class NameAnalyzer implements Visitor<Void> {
             symbolTable.top.put(myClassScope);
         }
         catch (ItemAlreadyExistsException exception) {
-            exception.emitErrorMessage(entryClassDeclaration.line, entryClassDeclaration.getName().toString(), "class");
+            exception.emitErrorMessage(entryClassDeclaration.line, entryClassDeclaration.getName().getName(), "class");
         }
         symbolTable.top.push(myClassScope.getSymbolTable());
         for (ClassMemberDeclaration md : entryClassDeclaration.getClassMembers()) {
@@ -272,11 +272,11 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(FieldDeclaration fieldDeclaration) {
-        FieldSymbolTableItem ft = new FieldSymbolTableItem(fieldDeclaration.getIdentifier().toString());
+        FieldSymbolTableItem ft = new FieldSymbolTableItem(fieldDeclaration.getIdentifier().getName());
         ft.setAccessModifier(fieldDeclaration.getAccessModifier());
         ft.setType(fieldDeclaration.getType());
         try {
-            if (fieldDeclaration.getIdentifier().toString().equals("length"))
+            if (fieldDeclaration.getIdentifier().getName().equals("length"))
                 throw new LengthFieldDeclarationException();
         }
         catch (LengthFieldDeclarationException exception) {
@@ -286,7 +286,7 @@ public class NameAnalyzer implements Visitor<Void> {
             symbolTable.top.put(ft);
         }
         catch (ItemAlreadyExistsException exception) {
-            exception.emitErrorMessage(fieldDeclaration.line, fieldDeclaration.getIdentifier().toString(), "field");
+            exception.emitErrorMessage(fieldDeclaration.line, fieldDeclaration.getIdentifier().getName(), "field");
         }
         return null;
     }
@@ -298,19 +298,19 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(MethodDeclaration methodDeclaration) {
-        MethodSymbolTableItem methodSymbolTableItem = new MethodSymbolTableItem(methodDeclaration.getName().toString());
+        MethodSymbolTableItem methodSymbolTableItem = new MethodSymbolTableItem(methodDeclaration.getName().getName());
         methodSymbolTableItem.setAccessModifier(methodDeclaration.getAccessModifier());
         methodSymbolTableItem.setReturnType(methodDeclaration.getReturnType());
         try {
             symbolTable.top.put(methodSymbolTableItem);
         }
         catch (ItemAlreadyExistsException exception) {
-            exception.emitErrorMessage(methodDeclaration.line, methodDeclaration.getName().toString(), "method");
+            exception.emitErrorMessage(methodDeclaration.line, methodDeclaration.getName().getName(), "method");
         }
 //        SymbolTable st = new SymbolTable(symbolTable.top);
         symbolTable.top.push(methodSymbolTableItem.getSymbolTable());
         for (ParameterDeclaration param : methodDeclaration.getArgs()) {
-            LocalVariableSymbolTableItem lvt = new LocalVariableSymbolTableItem(param.getIdentifier().toString(), varIndex);
+            LocalVariableSymbolTableItem lvt = new LocalVariableSymbolTableItem(param.getIdentifier().getName(), varIndex);
             param.getIdentifier().setIndex(varIndex);
             varIndex ++;
             try {
