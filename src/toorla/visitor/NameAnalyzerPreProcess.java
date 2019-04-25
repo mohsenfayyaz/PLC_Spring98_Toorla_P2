@@ -33,8 +33,6 @@ import java.util.Map;
 
 public class NameAnalyzerPreProcess implements Visitor<Void> {
     private SymbolTable symbolTable = new SymbolTable();
-    int varIndex = 1;
-    int scopeIndex = 0;
     private Map<String, SymbolTable> classSymbolTable;
 
     public Map<String, SymbolTable> getClassSymbolTable(){
@@ -224,6 +222,7 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
     public Void visit(ClassDeclaration classDeclaration) { //DONE
         String className = classDeclaration.getName().getName();
         ClassSymbolTableItem myClassScope = new ClassSymbolTableItem(className, symbolTable.top);
+        myClassScope.setParentName(classDeclaration.getParentName().getName());
         classSymbolTable.put(className, myClassScope.getSymbolTable());
 
         try {
@@ -242,9 +241,8 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
         String className = entryClassDeclaration.getName().getName();
         ClassSymbolTableItem myClassScope = new ClassSymbolTableItem(className, symbolTable.top);
+        myClassScope.setParentName(entryClassDeclaration.getParentName().getName());
         classSymbolTable.put(className, myClassScope.getSymbolTable());
-
-
         try {
             symbolTable.top.put(myClassScope);
         }
