@@ -52,7 +52,7 @@ public class NameAnalyzer implements Visitor<Void> {
 
     private List<SymbolTable> generateClassParentsSymbolsList(ClassDeclaration cd){
         List<SymbolTable> classes = new ArrayList<SymbolTable>();
-        while(cd != null && cd.getParentName() != null){
+        while(cd != null && cd.getParentName() != null && !classes.contains(classSymbolTable.get(cd.getParentName().getName()))){
             String parentName = cd.getParentName().getName();
             classes.add(classSymbolTable.get(parentName));
             cd = classNameNodes.get(parentName);
