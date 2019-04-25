@@ -33,7 +33,7 @@ import toorla.symbolTable.symbolTableItem.varItems.VarSymbolTableItem;
 import javax.sound.midi.SysexMessage;
 import java.util.List;
 
-public class NameAnalyzer implements Visitor<Void> {
+public class NameAnalyzerPreProcess implements Visitor<Void> {
     private SymbolTable symbolTable = new SymbolTable();
     int varIndex = 1;
     int scopeIndex = 0;
@@ -44,7 +44,7 @@ public class NameAnalyzer implements Visitor<Void> {
         return SCOPE_PREFIX + String.valueOf(scopeIndex);
     }
 
-    public NameAnalyzer(){
+    public NameAnalyzerPreProcess(){
         symbolTable.push(symbolTable);
         symbolTable.root = symbolTable;
     }

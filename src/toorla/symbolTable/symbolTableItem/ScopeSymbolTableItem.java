@@ -21,6 +21,11 @@ public class ScopeSymbolTableItem extends SymbolTableItem {
 //        statements.add(statement);
 //    }
 
+    public ScopeSymbolTableItem(String name, SymbolTable pre){
+        this.name=name;
+        this.symbolTable = new SymbolTable(pre);
+    }
+
 
     public SymbolTable getSymbolTable() {
         return symbolTable;

@@ -13,8 +13,9 @@ public class MethodSymbolTableItem extends SymbolTableItem {
     private SymbolTable symbolTable;
 //    private ArrayList<LocalVariableSymbolTableItem> args = new ArrayList<>();
 
-    public MethodSymbolTableItem (String name) {
-        this.name = name;
+    public MethodSymbolTableItem (String name, SymbolTable pre){
+        this.name=name;
+        this.symbolTable = new SymbolTable(pre);
     }
     @Override
     public String getKey() { return name; }
