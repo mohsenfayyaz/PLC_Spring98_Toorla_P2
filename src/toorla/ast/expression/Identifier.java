@@ -4,7 +4,7 @@ import toorla.visitor.Visitor;
 
 public class Identifier extends Expression {
     private String name;
-    private int index;
+    private int index = -1;
 
     public Identifier(String name) {
         this.name = name;
@@ -24,8 +24,13 @@ public class Identifier extends Expression {
 
     @Override
     public String toString() {
-        if( name != null )
-            return "(Identifier," + name + ")";
+        if( name != null ) {
+            if(index == -1) {
+                return "(Identifier," + name + ")";
+            }else{
+                return "(Identifier," + name + "_" + index + ")";
+            }
+        }
         else return "(Identifier,Dummy)";
     }
 }

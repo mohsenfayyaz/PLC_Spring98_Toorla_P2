@@ -46,6 +46,12 @@ public class SymbolTable {
         items.put(item.getKey(), item);
     }
 
+    public void putClassMembers(SymbolTableItem item) throws ItemAlreadyExistsException {
+        if (items.containsKey(item.getKey()))
+            throw new ItemAlreadyExistsException();
+        items.put(item.getKey(), item);
+    }
+
 
     public SymbolTableItem get(String key) throws ItemNotFoundException {
         SymbolTableItem value = items.get(key);
