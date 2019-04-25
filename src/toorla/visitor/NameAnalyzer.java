@@ -273,7 +273,7 @@ public class NameAnalyzer implements Visitor<Void> {
         }
         catch (ItemAlreadyExistsException exception) {
             hasError = true;
-            exception.emitErrorMessage(classDeclaration.line, classDeclaration.getName().getName(), "class");
+            exception.emitErrorMessage(classDeclaration.getName().line, classDeclaration.getName().getName(), "class");
         }
         symbolTable.top.push(myClassScope.getSymbolTable());
         for (ClassMemberDeclaration md : classDeclaration.getClassMembers()) {
@@ -293,7 +293,7 @@ public class NameAnalyzer implements Visitor<Void> {
         }
         catch (ItemAlreadyExistsException exception) {
             hasError = true;
-            exception.emitErrorMessage(entryClassDeclaration.line, entryClassDeclaration.getName().getName(), "class");
+            exception.emitErrorMessage(entryClassDeclaration.getName().line, entryClassDeclaration.getName().getName(), "class");
         }
         symbolTable.top.push(myClassScope.getSymbolTable());
         for (ClassMemberDeclaration md : entryClassDeclaration.getClassMembers()) {
@@ -359,7 +359,7 @@ public class NameAnalyzer implements Visitor<Void> {
         }
         catch (ItemAlreadyExistsException exception) {
             hasError = true;
-            exception.emitErrorMessage(methodDeclaration.line, methodName, "method");
+            exception.emitErrorMessage(methodDeclaration.getName().line, methodName, "method");
         }
 //        SymbolTable st = new SymbolTable(symbolTable.top);
         symbolTable.top.push(methodSymbolTableItem.getSymbolTable());
