@@ -288,15 +288,16 @@ public class NameAnalyzer implements Visitor<Void> {
         try {
             if (fieldDeclaration.getIdentifier().getName().equals("length"))
                 throw new LengthFieldDeclarationException();
+
+            try {
+                symbolTable.top.put(ft);
+            }
+            catch (ItemAlreadyExistsException exception) {
+                exception.emitErrorMessage(fieldDeclaration.line, fieldDeclaration.getIdentifier().getName(), "field");
+            }
         }
         catch (LengthFieldDeclarationException exception) {
             exception.emitErrorMessage(fieldDeclaration.line);
-        }
-        try {
-            symbolTable.top.put(ft);
-        }
-        catch (ItemAlreadyExistsException exception) {
-            exception.emitErrorMessage(fieldDeclaration.line, fieldDeclaration.getIdentifier().getName(), "field");
         }
         return null;
     }

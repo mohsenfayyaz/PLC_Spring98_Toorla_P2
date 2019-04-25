@@ -15,6 +15,6 @@ public class ItemAlreadyExistsException extends CompileErrorException {
         }
     }
     public void emitErrorMessage (int line, String varName) {
-        System.out.println("Error:Line:" + line + ":Redefinition of "+ varName +" localVar in current scope");
+        System.out.println("Error:Line:" + line + ":Redefinition of Local Variable "+ varName +" in current scope");
     }
 }
