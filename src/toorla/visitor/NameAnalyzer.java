@@ -40,6 +40,7 @@ public class NameAnalyzer implements Visitor<Void> {
     int varIndex = 1;
     int scopeIndex = 0;
     String SCOPE_PREFIX = "#SCOPE";
+    public boolean hasError = false;
     private Map<String, SymbolTable> classSymbolTable;
     private Map<String, ClassDeclaration> classNameNodes;
     private static ClassDeclaration currentClass;
@@ -130,6 +131,7 @@ public class NameAnalyzer implements Visitor<Void> {
         }
         catch (ItemAlreadyExistsException exception) {
             exception.emitErrorMessage(localVarDef.line, varName);
+            hasError = true;
         }
         localVarDef.getLocalVarName().setIndex(varIndex);
         varIndex++;
@@ -270,6 +272,7 @@ public class NameAnalyzer implements Visitor<Void> {
             symbolTable.top.put(myClassScope);
         }
         catch (ItemAlreadyExistsException exception) {
+            hasError = true;
             exception.emitErrorMessage(classDeclaration.line, classDeclaration.getName().getName(), "class");
         }
         symbolTable.top.push(myClassScope.getSymbolTable());
@@ -289,6 +292,7 @@ public class NameAnalyzer implements Visitor<Void> {
             symbolTable.top.put(myClassScope);
         }
         catch (ItemAlreadyExistsException exception) {
+            hasError = true;
             exception.emitErrorMessage(entryClassDeclaration.line, entryClassDeclaration.getName().getName(), "class");
         }
         symbolTable.top.push(myClassScope.getSymbolTable());
@@ -314,10 +318,12 @@ public class NameAnalyzer implements Visitor<Void> {
                 symbolTable.top.putClassMembers(ft, generateClassParentsSymbolsList(currentClass));
             }
             catch (ItemAlreadyExistsException exception) {
+                hasError = true;
                 exception.emitErrorMessage(fieldDeclaration.line, fieldDeclaration.getIdentifier().getName(), "field");
             }
         }
         catch (LengthFieldDeclarationException exception) {
+            hasError = true;
             exception.emitErrorMessage(fieldDeclaration.line);
         }
         return null;
@@ -334,6 +340,7 @@ public class NameAnalyzer implements Visitor<Void> {
             symbolTable.top.put(lvt);
         }
         catch (ItemAlreadyExistsException exception) {
+            hasError = true;
             exception.emitErrorMessage(parameterDeclaration.line, argName);
         }
         return null;
@@ -351,6 +358,7 @@ public class NameAnalyzer implements Visitor<Void> {
             symbolTable.top.putClassMembers(methodSymbolTableItem, generateClassParentsSymbolsList(currentClass));
         }
         catch (ItemAlreadyExistsException exception) {
+            hasError = true;
             exception.emitErrorMessage(methodDeclaration.line, methodName, "method");
         }
 //        SymbolTable st = new SymbolTable(symbolTable.top);
@@ -382,6 +390,7 @@ public class NameAnalyzer implements Visitor<Void> {
             symbolTable.top.put(myClassScope);
         }
         catch (ItemAlreadyExistsException exception) {
+            hasError = true;
         }
 
         List<ClassDeclaration> classes;

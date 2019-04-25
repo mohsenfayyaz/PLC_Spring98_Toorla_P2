@@ -26,7 +26,9 @@ public class ToorlaCompiler {
         Visitor<Void> nameAnalyzer = new NameAnalyzer(classSymbolTable, classNameNodes);
         toorlaASTCode.accept( nameAnalyzer );
 
-        Visitor<Void> treePrinter = new TreePrinter();
-        toorlaASTCode.accept( treePrinter );
+        if(((NameAnalyzer) nameAnalyzer).hasError == false) {
+            Visitor<Void> treePrinter = new TreePrinter();
+            toorlaASTCode.accept(treePrinter);
+        }
     }
 }
