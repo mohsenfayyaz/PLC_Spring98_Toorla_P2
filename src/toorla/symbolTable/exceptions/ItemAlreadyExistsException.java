@@ -3,7 +3,7 @@ package toorla.symbolTable.exceptions;
 import toorla.compileErrorException.CompileErrorException;
 
 public class ItemAlreadyExistsException extends CompileErrorException {
-    public void emitErrorMessage(int line, String name, String errorType) {
+    public void emitErrorMessage (int line, String name, String errorType) {
         if (errorType.equals("class")) {
             System.out.println("Error:Line:#" + line + ":Redefinition of Class "+ name );
         }
@@ -13,5 +13,8 @@ public class ItemAlreadyExistsException extends CompileErrorException {
         else if (errorType.equals("method")) {
             System.out.println("Error:Line:#" + line +  ":Redefinition of Method " + name);
         }
+    }
+    public void emitErrorMessage (int line) {
+        System.out.println("Error:Line:#" + line + ":Redefinition of Local Variable localVar in current scope");
     }
 }

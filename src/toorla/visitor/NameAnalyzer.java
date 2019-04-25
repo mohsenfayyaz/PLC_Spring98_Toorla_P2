@@ -97,12 +97,12 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(LocalVarDef localVarDef) {
-        LocalVariableSymbolTableItem lvt = new LocalVariableSymbolTableItem(localVarDef.getLocalVarName().toString(), varIndex);
+        LocalVariableSymbolTableItem localVariableSymbolTableItem = new LocalVariableSymbolTableItem(localVarDef.getLocalVarName().toString(), varIndex);
         try {
-            symbolTable.top.put(lvt);
+            symbolTable.top.put(localVariableSymbolTableItem);
         }
-        catch (Exception exception) {
-            System.out.println("Error:Line:#" + localVarDef.line + ":Redefinition of Local Variable localVar in current scope");
+        catch (ItemAlreadyExistsException exception) {
+            exception.emitErrorMessage(localVarDef.line);
         }
         localVarDef.getLocalVarName().setIndex(varIndex);
         varIndex++;
