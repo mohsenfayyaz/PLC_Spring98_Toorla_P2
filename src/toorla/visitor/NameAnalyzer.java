@@ -26,6 +26,7 @@ import toorla.symbolTable.exceptions.LengthFieldDeclarationException;
 import toorla.symbolTable.symbolTableItem.ClassSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.FieldSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.MethodSymbolTableItem;
+import toorla.symbolTable.symbolTableItem.ScopeSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.LocalVariableSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.VarSymbolTableItem;
 
@@ -52,9 +53,12 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(Block block) {
+        ScopeSymbolTableItem scopeSymbolTableItem = new ScopeSymbolTableItem();
+        symbolTable.top.push(scopeSymbolTableItem.getSymbolTable());
         for (Statement statement : block.body) {
             statement.accept(this);
         }
+        symbolTable.top.pop();
         return null;
     }
 
@@ -303,13 +307,14 @@ public class NameAnalyzer implements Visitor<Void> {
         catch (ItemAlreadyExistsException exception) {
             exception.emitErrorMessage(methodDeclaration.line, methodDeclaration.getName().toString(), "method");
         }
-        SymbolTable st = new SymbolTable(symbolTable.top);
+//        SymbolTable st = new SymbolTable(symbolTable.top);
+        symbolTable.top.push(methodSymbolTableItem.getSymbolTable());
         for (ParameterDeclaration param : methodDeclaration.getArgs()) {
             LocalVariableSymbolTableItem lvt = new LocalVariableSymbolTableItem(param.getIdentifier().toString(), varIndex);
             param.getIdentifier().setIndex(varIndex);
             varIndex ++;
             try {
-                st.put(lvt);
+                symbolTable.top.put(lvt);
             }
             catch (Exception exception) {
                 // nothing to do with this one cause absolutely no errors gonna happen
