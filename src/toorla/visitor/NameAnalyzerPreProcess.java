@@ -37,12 +37,7 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
     private SymbolTable symbolTable = new SymbolTable();
     int varIndex = 1;
     int scopeIndex = 0;
-    String SCOPE_PREFIX = "#SCOPE";
 
-    private String generateScopeName(){
-        scopeIndex++;
-        return SCOPE_PREFIX + String.valueOf(scopeIndex);
-    }
 
     public NameAnalyzerPreProcess(){
         symbolTable.push(symbolTable);
@@ -60,27 +55,16 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
 
     @Override
     public Void visit(Block block) {
-        block.symbolTable = symbolTable.top;
-        scopeIndex++;
-        ScopeSymbolTableItem scopeSymbolTableItem = new ScopeSymbolTableItem(generateScopeName(), symbolTable.top);
-        symbolTable.top.push(scopeSymbolTableItem.getSymbolTable());
-        for (Statement statement : block.body) {
-            statement.accept(this);
-        }
-        symbolTable.top.pop();
         return null;
     }
 
     @Override
     public Void visit(Conditional conditional) {
-        conditional.getThenStatement().accept(this);
-        conditional.getElseStatement().accept(this);
         return null;
     }
 
     @Override
     public Void visit(While whileStat) {
-        whileStat.body.accept(this);
         return null;
     }
 
@@ -106,16 +90,6 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
 
     @Override
     public Void visit(LocalVarDef localVarDef) {
-        String varName = localVarDef.getLocalVarName().getName();
-        LocalVariableSymbolTableItem localVariableSymbolTableItem = new LocalVariableSymbolTableItem(varName, varIndex);
-        try {
-            symbolTable.top.put(localVariableSymbolTableItem);
-        }
-        catch (ItemAlreadyExistsException exception) {
-            exception.emitErrorMessage(localVarDef.line, varName);
-        }
-        localVarDef.getLocalVarName().setIndex(varIndex);
-        varIndex++;
         return null;
     }
 
@@ -251,9 +225,7 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
         try {
             symbolTable.top.put(myClassScope);
         }
-        catch (ItemAlreadyExistsException exception) {
-            exception.emitErrorMessage(classDeclaration.line, classDeclaration.getName().getName(), "class");
-        }
+        catch (ItemAlreadyExistsException exception) {}
         symbolTable.top.push(myClassScope.getSymbolTable());
         for (ClassMemberDeclaration md : classDeclaration.getClassMembers()) {
             md.accept(this);
@@ -269,9 +241,7 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
         try {
             symbolTable.top.put(myClassScope);
         }
-        catch (ItemAlreadyExistsException exception) {
-            exception.emitErrorMessage(entryClassDeclaration.line, entryClassDeclaration.getName().getName(), "class");
-        }
+        catch (ItemAlreadyExistsException exception) {}
         symbolTable.top.push(myClassScope.getSymbolTable());
         for (ClassMemberDeclaration md : entryClassDeclaration.getClassMembers()) {
             md.accept(this);
@@ -286,35 +256,14 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
         ft.setAccessModifier(fieldDeclaration.getAccessModifier());
         ft.setType(fieldDeclaration.getType());
         try {
-            if (fieldDeclaration.getIdentifier().getName().equals("length"))
-                throw new LengthFieldDeclarationException();
-        }
-        catch (LengthFieldDeclarationException exception) {
-            exception.emitErrorMessage(fieldDeclaration.line);
-        }
-        try {
             symbolTable.top.put(ft);
         }
-        catch (ItemAlreadyExistsException exception) {
-            exception.emitErrorMessage(fieldDeclaration.line, fieldDeclaration.getIdentifier().getName(), "field");
-        }
+        catch (ItemAlreadyExistsException exception) {}
         return null;
     }
 
     @Override
     public Void visit(ParameterDeclaration parameterDeclaration) {
-
-        parameterDeclaration.symbolTable = symbolTable.top;
-        String argName = parameterDeclaration.getIdentifier().getName();
-        LocalVariableSymbolTableItem lvt = new LocalVariableSymbolTableItem(argName, varIndex);
-        parameterDeclaration.getIdentifier().setIndex(varIndex);
-        varIndex ++;
-        try {
-            symbolTable.top.put(lvt);
-        }
-        catch (ItemAlreadyExistsException exception) {
-            exception.emitErrorMessage(parameterDeclaration.line, argName);
-        }
         return null;
     }
 
@@ -329,28 +278,14 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
         try {
             symbolTable.top.put(methodSymbolTableItem);
         }
-        catch (ItemAlreadyExistsException exception) {
-            exception.emitErrorMessage(methodDeclaration.line, methodName, "method");
-        }
-//        SymbolTable st = new SymbolTable(symbolTable.top);
+        catch (ItemAlreadyExistsException exception) {}
         symbolTable.top.push(methodSymbolTableItem.getSymbolTable());
-        for (ParameterDeclaration param : methodDeclaration.getArgs()) {
-            param.accept(this);
-        }
-        for (Statement statement: methodDeclaration.getBody()) {
-            statement.accept(this);
-        }
-        varIndex = 1;
         symbolTable.top.pop();
         return null;
     }
 
     @Override
     public Void visit(LocalVarsDefinitions localVarsDefinitions) {
-        for (LocalVarDef var : localVarsDefinitions.getVarDefinitions()) {
-            var.accept(this);
-        }
-
         return null;
     }
 
@@ -360,8 +295,7 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
         try {
             symbolTable.top.put(myClassScope);
         }
-        catch (ItemAlreadyExistsException exception) {
-        }
+        catch (ItemAlreadyExistsException exception) {}
 
         List<ClassDeclaration> classes;
         classes = program.getClasses();
