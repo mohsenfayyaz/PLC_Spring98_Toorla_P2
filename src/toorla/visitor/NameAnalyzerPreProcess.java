@@ -28,6 +28,7 @@ import toorla.symbolTable.symbolTableItem.varItems.LocalVariableSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.VarSymbolTableItem;
 
 import javax.sound.midi.SysexMessage;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,10 +36,15 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
     private SymbolTable symbolTable = new SymbolTable();
     int varIndex = 1;
     int scopeIndex = 0;
-    private Map<String, SymbolTable> classSymbolTable;
+    private Map<String, SymbolTable> classSymbolTable = new HashMap<>();
+    private Map<String, ClassDeclaration> classNameNodes = new HashMap<>();
 
     public Map<String, SymbolTable> getClassSymbolTable(){
         return classSymbolTable;
+    }
+
+    public Map<String, ClassDeclaration> getclassNameNodes(){
+        return classNameNodes;
     }
 
     public NameAnalyzerPreProcess(){
@@ -224,7 +230,7 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
     public Void visit(ClassDeclaration classDeclaration) { //DONE
         String className = classDeclaration.getName().getName();
         ClassSymbolTableItem myClassScope = new ClassSymbolTableItem(className, symbolTable.top);
-        classSymbolTable.put(className, myClassScope.getSymbolTable());
+        classNameNodes.put(className, classDeclaration);
 
         try {
             symbolTable.top.put(myClassScope);
@@ -242,8 +248,7 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
         String className = entryClassDeclaration.getName().getName();
         ClassSymbolTableItem myClassScope = new ClassSymbolTableItem(className, symbolTable.top);
-        classSymbolTable.put(className, myClassScope.getSymbolTable());
-
+        classNameNodes.put(className, entryClassDeclaration);
 
         try {
             symbolTable.top.put(myClassScope);

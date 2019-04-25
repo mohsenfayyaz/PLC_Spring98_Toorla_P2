@@ -31,20 +31,37 @@ import toorla.symbolTable.symbolTableItem.varItems.LocalVariableSymbolTableItem;
 import toorla.symbolTable.symbolTableItem.varItems.VarSymbolTableItem;
 
 import javax.sound.midi.SysexMessage;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class NameAnalyzer implements Visitor<Void> {
     private SymbolTable symbolTable = new SymbolTable();
     int varIndex = 1;
     int scopeIndex = 0;
     String SCOPE_PREFIX = "#SCOPE";
+    private Map<String, SymbolTable> classSymbolTable;
+    private Map<String, ClassDeclaration> classNameNodes;
+    private static ClassDeclaration currentClass;
 
     private String generateScopeName(){
         scopeIndex++;
         return SCOPE_PREFIX + String.valueOf(scopeIndex);
     }
 
-    public NameAnalyzer(){
+    private List<SymbolTable> generateClassParentsSymbolsList(ClassDeclaration cd){
+        List<SymbolTable> classes = new ArrayList<SymbolTable>();
+        while(cd != null && cd.getParentName() != null){
+            String parentName = cd.getParentName().getName();
+            classes.add(classSymbolTable.get(parentName));
+            cd = classNameNodes.get(parentName);
+        }
+        return classes;
+    }
+
+    public NameAnalyzer(Map<String, SymbolTable> classSymbolTable, Map<String, ClassDeclaration> classNameNodes){
+        this.classSymbolTable = classSymbolTable;
+        this.classNameNodes = classNameNodes;
         symbolTable.push(symbolTable);
         symbolTable.root = symbolTable;
     }
@@ -246,6 +263,7 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(ClassDeclaration classDeclaration) { //DONE
+        currentClass = classDeclaration;
         String className = classDeclaration.getName().getName();
         ClassSymbolTableItem myClassScope = new ClassSymbolTableItem(className, symbolTable.top);
         try {
@@ -264,6 +282,7 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
+        currentClass = entryClassDeclaration;
         String className = entryClassDeclaration.getName().getName();
         ClassSymbolTableItem myClassScope = new ClassSymbolTableItem(className, symbolTable.top);
         try {
@@ -292,8 +311,7 @@ public class NameAnalyzer implements Visitor<Void> {
                 throw new LengthFieldDeclarationException();
 
             try {
-                symbolTable.top.putClassMembers(ft, symbolTable.top);
-
+                symbolTable.top.putClassMembers(ft, generateClassParentsSymbolsList(currentClass));
             }
             catch (ItemAlreadyExistsException exception) {
                 exception.emitErrorMessage(fieldDeclaration.line, fieldDeclaration.getIdentifier().getName(), "field");
@@ -330,7 +348,7 @@ public class NameAnalyzer implements Visitor<Void> {
         methodSymbolTableItem.setAccessModifier(methodDeclaration.getAccessModifier());
         methodSymbolTableItem.setReturnType(methodDeclaration.getReturnType());
         try {
-            symbolTable.top.putClassMembers(methodSymbolTableItem, symbolTable.top);
+            symbolTable.top.putClassMembers(methodSymbolTableItem, generateClassParentsSymbolsList(currentClass));
         }
         catch (ItemAlreadyExistsException exception) {
             exception.emitErrorMessage(methodDeclaration.line, methodName, "method");

@@ -5,6 +5,7 @@ import toorla.symbolTable.exceptions.ItemNotFoundException;
 import toorla.symbolTable.symbolTableItem.SymbolTableItem;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SymbolTable {
@@ -46,17 +47,15 @@ public class SymbolTable {
         items.put(item.getKey(), item);
     }
 
-    public void putClassMembers(SymbolTableItem item, SymbolTable classSymbolTable) throws ItemAlreadyExistsException {
-        SymbolTable ancestorsSymbolTable = classSymbolTable;
-
-        while(ancestorsSymbolTable.pre != null) {
-            if (ancestorsSymbolTable.items.containsKey(item.getKey()))
+    public void putClassMembers(SymbolTableItem item, List<SymbolTable> parentsSymbolTables) throws ItemAlreadyExistsException {
+        for (SymbolTable parentSymbolTable: parentsSymbolTables) {
+            if (parentSymbolTable != null && parentSymbolTable.items.containsKey(item.getKey()))
                 throw new ItemAlreadyExistsException();
-
-            ancestorsSymbolTable.items.put(item.getKey(), item);
-
-            ancestorsSymbolTable = ancestorsSymbolTable.pre;
         }
+
+        if (items.containsKey(item.getKey()))
+            throw new ItemAlreadyExistsException();
+        items.put(item.getKey(), item);
     }
 
 
