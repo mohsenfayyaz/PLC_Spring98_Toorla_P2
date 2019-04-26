@@ -40,6 +40,7 @@ public class NameAnalyzer implements Visitor<Void> {
     int varIndex = 1;
     int scopeIndex = 0;
     String SCOPE_PREFIX = "#SCOPE";
+    String METHOD_PREFIX = "#METHOD_";
     public boolean hasError = false;
     private Map<String, SymbolTable> classSymbolTable;
     private Map<String, ClassDeclaration> classNameNodes;
@@ -91,14 +92,27 @@ public class NameAnalyzer implements Visitor<Void> {
 
     @Override
     public Void visit(Conditional conditional) {
+        scopeIndex++;
+        ScopeSymbolTableItem scopeSymbolTableItem = new ScopeSymbolTableItem(generateScopeName(), symbolTable.top);
+        symbolTable.top.push(scopeSymbolTableItem.getSymbolTable());
         conditional.getThenStatement().accept(this);
+        symbolTable.top.pop();
+
+        scopeIndex++;
+        ScopeSymbolTableItem scopeSymbolTableItem2 = new ScopeSymbolTableItem(generateScopeName(), symbolTable.top);
+        symbolTable.top.push(scopeSymbolTableItem2.getSymbolTable());
         conditional.getElseStatement().accept(this);
+        symbolTable.top.pop();
         return null;
     }
 
     @Override
     public Void visit(While whileStat) {
+        scopeIndex++;
+        ScopeSymbolTableItem scopeSymbolTableItem = new ScopeSymbolTableItem(generateScopeName(), symbolTable.top);
+        symbolTable.top.push(scopeSymbolTableItem.getSymbolTable());
         whileStat.body.accept(this);
+        symbolTable.top.pop();
         return null;
     }
 
@@ -351,6 +365,8 @@ public class NameAnalyzer implements Visitor<Void> {
         methodDeclaration.symbolTable = symbolTable.top;
 
         String methodName = methodDeclaration.getName().getName();
+        methodName = METHOD_PREFIX + methodName;
+
         MethodSymbolTableItem methodSymbolTableItem = new MethodSymbolTableItem(methodName, symbolTable.top);
         methodSymbolTableItem.setAccessModifier(methodDeclaration.getAccessModifier());
         methodSymbolTableItem.setReturnType(methodDeclaration.getReturnType());
