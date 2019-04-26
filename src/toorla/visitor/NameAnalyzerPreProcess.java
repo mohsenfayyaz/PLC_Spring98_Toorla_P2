@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 public class NameAnalyzerPreProcess implements Visitor<Void> {
+    String METHOD_PREFIX = "#METHOD_";
+
     private SymbolTable symbolTable = new SymbolTable();
     int varIndex = 1;
     int scopeIndex = 0;
@@ -286,6 +288,8 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
         methodDeclaration.symbolTable = symbolTable.top;
 
         String methodName = methodDeclaration.getName().getName();
+        methodName = METHOD_PREFIX + methodName;
+
         MethodSymbolTableItem methodSymbolTableItem = new MethodSymbolTableItem(methodName, symbolTable.top);
         methodSymbolTableItem.setAccessModifier(methodDeclaration.getAccessModifier());
         methodSymbolTableItem.setReturnType(methodDeclaration.getReturnType());

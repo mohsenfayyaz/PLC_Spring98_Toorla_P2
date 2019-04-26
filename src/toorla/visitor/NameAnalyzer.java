@@ -365,6 +365,7 @@ public class NameAnalyzer implements Visitor<Void> {
         methodDeclaration.symbolTable = symbolTable.top;
 
         String methodName = methodDeclaration.getName().getName();
+        String methodRealName = methodName;
         methodName = METHOD_PREFIX + methodName;
 
         MethodSymbolTableItem methodSymbolTableItem = new MethodSymbolTableItem(methodName, symbolTable.top);
@@ -375,7 +376,7 @@ public class NameAnalyzer implements Visitor<Void> {
         }
         catch (ItemAlreadyExistsException exception) {
             hasError = true;
-            exception.emitErrorMessage(methodDeclaration.getName().line, methodName, "method");
+            exception.emitErrorMessage(methodDeclaration.getName().line, methodRealName, "method");
         }
 //        SymbolTable st = new SymbolTable(symbolTable.top);
         symbolTable.top.push(methodSymbolTableItem.getSymbolTable());
