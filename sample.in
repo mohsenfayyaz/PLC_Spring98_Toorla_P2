@@ -1,33 +1,16 @@
-class Yazdani inherits Ahmadhossein:
-    field x1 , y1 , z bool;
-
-
-    private function main( a : int ) returns int :
-        return 0;
-    end
-
-
+entry class aaa inherits sss0:
+    public field a int;
 
 end
 
-
-entry class Ahmadhossein inherits Any1 :
-    field x , y , z int;
-
-    public function main() returns int :
-        return 0;
-    end
-
-
+class Any:
+public field a int;
 end
 
-class Any :
-    field x int;
-
-
+class sss2 inherits Any:
+    public field a int;
 end
 
+class sss0:
 
-class Any1:
-    field z int;
 end

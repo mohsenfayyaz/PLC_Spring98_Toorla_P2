@@ -232,9 +232,10 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
     public Void visit(ClassDeclaration classDeclaration) { //DONE
         String className = classDeclaration.getName().getName();
         ClassSymbolTableItem myClassScope = new ClassSymbolTableItem(className, symbolTable.top);
-        classNameNodes.put(className, classDeclaration);
-        classSymbolTable.put(className, myClassScope.getSymbolTable());
-
+        if (!classNameNodes.containsKey(className)) {
+            classNameNodes.put(className, classDeclaration);
+            classSymbolTable.put(className, myClassScope.getSymbolTable());
+        }
         try {
             symbolTable.top.put(myClassScope);
         }
@@ -251,6 +252,10 @@ public class NameAnalyzerPreProcess implements Visitor<Void> {
     public Void visit(EntryClassDeclaration entryClassDeclaration) {
         String className = entryClassDeclaration.getName().getName();
         ClassSymbolTableItem myClassScope = new ClassSymbolTableItem(className, symbolTable.top);
+        if (!classNameNodes.containsKey(className)) {
+            classNameNodes.put(className, entryClassDeclaration);
+            classSymbolTable.put(className, myClassScope.getSymbolTable());
+        }
         classNameNodes.put(className, entryClassDeclaration);
         classSymbolTable.put(className, myClassScope.getSymbolTable());
 

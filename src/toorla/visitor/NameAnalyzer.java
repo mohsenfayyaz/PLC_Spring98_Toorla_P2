@@ -403,6 +403,8 @@ public class NameAnalyzer implements Visitor<Void> {
     @Override
     public Void visit(Program program) { // DONE
         ClassSymbolTableItem myClassScope = new ClassSymbolTableItem("Any", symbolTable.top);
+        classNameNodes.put("Any", new ClassDeclaration(new Identifier("Any")));
+        classSymbolTable.put("Any", myClassScope.getSymbolTable());
         try {
             symbolTable.top.put(myClassScope);
         }
