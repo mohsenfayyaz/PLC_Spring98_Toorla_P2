@@ -1,16 +1,15 @@
-entry class aaa inherits sss0:
+class aaa inherits sss0:
     public field a int;
 
-end
-
-class Any:
-public field a int;
-end
-
-class sss2 inherits Any:
-    public field a int;
 end
 
 class sss0:
 
+end
+
+entry class sss0 inherits aaa:
+    public field a int;
+end
+
+class sss0:
 end
